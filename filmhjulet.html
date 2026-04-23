@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Filmhjulet</title>
+  <link rel="icon" type="image/png" href="assets/oss.png">
+  <link rel="apple-touch-icon" href="assets/oss.png">
   
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
@@ -499,7 +501,7 @@
     const CX = W / 2, CY = H / 2, R = W / 2 - 8;
 
     const centerImage = new Image();
-    centerImage.src = 'Anniken.webp';
+    centerImage.src = 'assets/Anniken.webp';
     centerImage.onload = () => {
       if (currentMovies && currentMovies.length > 0) {
         drawWheel(currentMovies);
