@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="no">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>K+A &lt;3</title>
   <link rel="icon" type="image/png" href="assets/oss.png">
   <link rel="apple-touch-icon" href="assets/oss.png">
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;600&display=swap"
+    rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     :root {
       --bg-color: #ffdce8;
@@ -161,17 +169,99 @@
       box-shadow: var(--shadow-sm);
     }
 
-    /* Desktop Enhancements */
-    @media (min-width: 600px) {
-      .countdown { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-      .btn-large:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(217,108,142,0.4); }
+    .heart {
+      position: absolute;
+      font-size: 1.5rem;
+      pointer-events: none;
+      animation: floatUp 1.2s ease-out forwards;
+      z-index: 10;
+      will-change: transform, opacity;
     }
 
-    @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes scaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-    @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
-    @keyframes pulseGlow { 0% { transform: scale(0.9); opacity: 0.2; } 100% { transform: scale(1.1); opacity: 0.4; } }
+    @keyframes floatUp {
+      0% {
+        transform: translate(-50%, -50%) scale(0.8) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-50%, -160%) scale(1.6) rotate(25deg);
+        opacity: 0;
+      }
+    }
+
+    /* Desktop Enhancements */
+    @media (min-width: 600px) {
+      .countdown {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+      }
+
+      .btn-large:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(217, 108, 142, 0.4);
+      }
+    }
+
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleUp {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.2;
+      }
+
+      100% {
+        transform: scale(1.1);
+        opacity: 0.4;
+      }
+    }
 
     .hero-image-wrapper {
       position: relative;
@@ -208,6 +298,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="app-container">
     <header>
@@ -236,7 +327,7 @@
         </div>
       </div>
       <p class="finished-message" id="finished">🎉 Han er her! 🎉</p>
-      
+
       <div class="hero-image-wrapper">
         <div class="hero-image-glow"></div>
         <img src="assets/zadar.png" alt="Zadar" class="hero-image" loading="lazy">
@@ -264,19 +355,64 @@
         return;
       }
 
-      const days    = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-      document.getElementById('days').textContent    = pad(days);
-      document.getElementById('hours').textContent   = pad(hours);
+      document.getElementById('days').textContent = pad(days);
+      document.getElementById('hours').textContent = pad(hours);
       document.getElementById('minutes').textContent = pad(minutes);
       document.getElementById('seconds').textContent = pad(seconds);
     }
 
     tick();
     setInterval(tick, 1000);
+
+    const hero = document.querySelector('.hero-image-wrapper');
+
+    const emojis = ['💖', '💕', '💗', '💘'];
+
+    let isTouching = false;
+
+    function spawnHeart(x, y) {
+      const rect = hero.getBoundingClientRect();
+
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+      // Position relative to wrapper
+      heart.style.left = `${x - rect.left}px`;
+      heart.style.top = `${y - rect.top}px`;
+
+      hero.appendChild(heart);
+
+      setTimeout(() => heart.remove(), 1200);
+    }
+
+    // 🔹 Mouse (desktop)
+    hero.addEventListener('mousedown', () => isTouching = true);
+    hero.addEventListener('mouseup', () => isTouching = false);
+    hero.addEventListener('mouseleave', () => isTouching = false);
+
+    hero.addEventListener('mousemove', (e) => {
+      if (!isTouching) return;
+      spawnHeart(e.clientX, e.clientY);
+    });
+
+    // 🔹 Touch (mobile)
+    hero.addEventListener('touchstart', () => isTouching = true);
+
+    hero.addEventListener('touchend', () => isTouching = false);
+
+    hero.addEventListener('touchmove', (e) => {
+      if (!isTouching) return;
+
+      const touch = e.touches[0];
+      spawnHeart(touch.clientX, touch.clientY);
+    });
   </script>
 </body>
+
 </html>
