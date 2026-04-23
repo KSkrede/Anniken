@@ -192,6 +192,41 @@
     @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes scaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+    @keyframes pulseGlow { 0% { transform: scale(0.9); opacity: 0.2; } 100% { transform: scale(1.1); opacity: 0.4; } }
+
+    .hero-image-wrapper {
+      position: relative;
+      margin: 0 auto 2.5rem;
+      width: clamp(200px, 70vw, 360px);
+      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+      opacity: 0;
+      z-index: 1;
+    }
+
+    .hero-image {
+      width: 100%;
+      height: auto;
+      border-radius: 1.5rem;
+      position: relative;
+      z-index: 2;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-image-wrapper:hover .hero-image {
+      transform: translateY(-8px) scale(1.03) rotate(-2deg);
+    }
+
+    .hero-image-glow {
+      position: absolute;
+      inset: -15%;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      filter: blur(20px);
+      opacity: 0.4;
+      z-index: 1;
+      border-radius: 50%;
+      animation: pulseGlow 4s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -225,6 +260,11 @@
         </div>
       </div>
       <p class="finished-message" id="finished">🎉 Han er her! 🎉</p>
+      
+      <div class="hero-image-wrapper">
+        <div class="hero-image-glow"></div>
+        <img src="assets/zadar.png" alt="Zadar" class="hero-image" loading="lazy">
+      </div>
     </main>
 
     <div class="nav-footer">
