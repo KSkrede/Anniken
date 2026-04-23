@@ -498,6 +498,14 @@
     const W = wheel.width, H = wheel.height;
     const CX = W / 2, CY = H / 2, R = W / 2 - 8;
 
+    const centerImage = new Image();
+    centerImage.src = 'Anniken.webp';
+    centerImage.onload = () => {
+      if (currentMovies && currentMovies.length > 0) {
+        drawWheel(currentMovies);
+      }
+    };
+
     function drawWheel(movies) {
       ctx.clearRect(0, 0, W, H);
       if (!movies.length) return;
@@ -548,70 +556,30 @@
       ctx.stroke();
 
       // Center hub
+      ctx.save();
       ctx.beginPath();
       ctx.arc(CX, CY, 56, 0, Math.PI * 2);
+      ctx.clip();
       ctx.fillStyle = '#fff';
       ctx.fill();
+      if (centerImage.complete && centerImage.naturalWidth > 0) {
+        ctx.drawImage(centerImage, CX - 56, CY - 56, 112, 112);
+      } else {
+        ctx.fillStyle = '#c2607e';
+        ctx.font = 'italic 40px "Instrument Serif", serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🎬', CX, CY + 2);
+      }
+      ctx.restore();
+      
+      // Draw border ring over it
+      ctx.beginPath();
+      ctx.arc(CX, CY, 56, 0, Math.PI * 2);
       ctx.strokeStyle = '#e8a0b4';
       ctx.lineWidth = 4;
       ctx.stroke();
-
-      ctx.fillStyle = '#c2607e';
-      ctx.font = 'italic 40px "Instrument Serif", serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('🎬', CX, CY + 2);
     }
-
-    
-      // --- Audio Setup ---
-      let audioCtx = null;
-      function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-      }
-      function playTick() {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-        
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-        
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + 0.05);
-      }
-
-      
-      // --- Audio Setup ---
-      let audioCtx = null;
-      function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-      }
-      function playTick() {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-        
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-        
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + 0.05);
-      }
 
       
       // --- Audio Setup ---
@@ -667,12 +635,36 @@
         // small jitter so the pointer doesn't always land dead-center (kept well inside the sector)
         delta += (Math.random() - 0.5) * sliceDeg * 0.55;
 
+        initAudio();
         const final = currentRotation + delta;
         wheel.style.transition = 'transform 4.6s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
         wheel.style.transform = 'rotate(' + final + 'deg)';
         currentRotation = final;
 
         let done = false;
+        let lastSlice = -1;
+        const style = window.getComputedStyle(wheel);
+        
+        function tickLoop() {
+          if (done) return;
+          let currentDeg = 0;
+          if (style.transform && style.transform !== 'none') {
+            const values = style.transform.split('(')[1].split(')')[0].split(',');
+            const a = parseFloat(values[0]);
+            const b = parseFloat(values[1]);
+            currentDeg = Math.atan2(b, a) * (180 / Math.PI);
+          }
+          if (currentDeg < 0) currentDeg += 360;
+          
+          const currentSlice = Math.floor(currentDeg / sliceDeg);
+          if (lastSlice !== -1 && lastSlice !== currentSlice) {
+            playTick();
+          }
+          lastSlice = currentSlice;
+          requestAnimationFrame(tickLoop);
+        }
+        requestAnimationFrame(tickLoop);
+
         const onEnd = () => {
           if (done) return;
           done = true;
