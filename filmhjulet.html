@@ -606,6 +606,28 @@
         osc.stop(audioCtx.currentTime + 0.05);
       }
 
+      function playHooray() {
+        if (!audioCtx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'sine';
+          const startTime = audioCtx.currentTime + i * 0.1;
+          osc.frequency.setValueAtTime(freq, startTime);
+          
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(0.2, startTime + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+          
+          osc.start(startTime);
+          osc.stop(startTime + 0.5);
+        });
+      }
+
       // --- Spin logic ---
     let currentMovies = [];
     let currentSelection = null;
@@ -643,9 +665,10 @@
 
         let done = false;
         let lastSlice = -1;
+        let lastTickTime = 0;
         const style = window.getComputedStyle(wheel);
         
-        function tickLoop() {
+        function tickLoop(time) {
           if (done) return;
           let currentDeg = 0;
           if (style.transform && style.transform !== 'none') {
@@ -658,7 +681,12 @@
           
           const currentSlice = Math.floor(currentDeg / sliceDeg);
           if (lastSlice !== -1 && lastSlice !== currentSlice) {
-            playTick();
+            const now = Date.now();
+            // Cap tick rate to avoid blocking the audio context when there are many elements
+            if (now - lastTickTime > 40) {
+              playTick();
+              lastTickTime = now;
+            }
           }
           lastSlice = currentSlice;
           requestAnimationFrame(tickLoop);
@@ -693,6 +721,7 @@
       await spinTo(pick.i, currentMovies.length);
       spinning = false;
       document.getElementById('spin').disabled = false;
+      playHooray();
       showModal(pick.m);
     }
 
