@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL \"https://docs.google.com/spreadsheets/d/1D2roq_7WRsH5Bk9_jtyq8HbHo7D-8LxqOQq8O2BVRo4/export?format=csv&gid=0\" -o /tmp/sheet.csv -w \"HTTP %{http_code}\\\\n\")",
+      "Read(//tmp/**)"
+    ]
+  }
+}

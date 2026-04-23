@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Filmhjulet</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 40%, #ffd1dc 70%, #fce4ec 100%);
+      font-family: 'Lato', sans-serif;
+      color: #8b4a62;
+      text-align: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 8px 40px rgba(199, 100, 140, 0.18);
+      max-width: 640px;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 700;
+      color: #c2607e;
+      margin-bottom: 0.3rem;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: #b07090;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.08em;
+    }
+
+    .wheel-wrap {
+      position: relative;
+      width: min(86vw, 460px);
+      height: min(86vw, 460px);
+      margin: 0.5rem auto 1.2rem;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 28px solid #c2607e;
+      z-index: 2;
+      filter: drop-shadow(0 2px 3px rgba(139, 74, 98, 0.4));
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 50%;
+      box-shadow: 0 6px 28px rgba(199, 100, 140, 0.28);
+      transform: rotate(0deg);
+      transition: none;
+      will-change: transform;
+    }
+
+    .spin-btn {
+      font-family: 'Lato', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: #fff;
+      background: linear-gradient(160deg, #e8a0b4 0%, #c2607e 100%);
+      border: none;
+      border-radius: 999px;
+      padding: 0.95rem 2.4rem;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(199, 100, 140, 0.3);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      text-transform: uppercase;
+    }
+    .spin-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(199, 100, 140, 0.4); }
+    .spin-btn:active:not(:disabled) { transform: translateY(0); }
+    .spin-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .count {
+      font-size: 0.85rem;
+      color: #b07090;
+      margin-top: 1rem;
+      letter-spacing: 0.06em;
+    }
+
+    .links {
+      margin-top: 1.4rem;
+      font-size: 0.85rem;
+    }
+    .links a {
+      color: #b07090;
+      text-decoration: none;
+      margin: 0 0.6rem;
+    }
+    .links a:hover { color: #c2607e; text-decoration: underline; }
+
+    .empty {
+      padding: 2.5rem 1rem 1rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: #c2607e;
+    }
+    .empty .reset-link {
+      display: inline-block;
+      margin-top: 1rem;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      color: #c2607e;
+      text-decoration: underline;
+    }
+
+    .error {
+      padding: 1rem;
+      background: #fde7ef;
+      border-radius: 0.8rem;
+      color: #8b4a62;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(139, 74, 98, 0.55);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 10;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.4rem 1.4rem;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 16px 50px rgba(139, 74, 98, 0.35);
+      animation: pop 0.28s cubic-bezier(0.17, 0.67, 0.4, 1.1);
+    }
+    @keyframes pop {
+      from { transform: scale(0.88); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .poster {
+      width: 58%;
+      max-width: 200px;
+      aspect-ratio: 2/3;
+      border-radius: 0.8rem;
+      margin: 0 auto 1rem;
+      display: block;
+      object-fit: cover;
+      box-shadow: 0 6px 20px rgba(139, 74, 98, 0.25);
+      background: #fde7ef;
+    }
+    .poster-fallback {
+      width: 58%;
+      max-width: 200px;
+      aspect-ratio: 2/3;
+      margin: 0 auto 1rem;
+      border-radius: 0.8rem;
+      background: linear-gradient(160deg, #ffd6e7 0%, #f8bbd0 60%, #e8a0b4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(139, 74, 98, 0.25);
+    }
+
+    .modal h2 {
+      font-family: 'Playfair Display', serif;
+      color: #c2607e;
+      font-size: 1.45rem;
+      margin-bottom: 0.25rem;
+      line-height: 1.2;
+    }
+    .modal .year {
+      color: #b07090;
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+    .modal-buttons button {
+      flex: 1 1 130px;
+      padding: 0.85rem 0.8rem;
+      border-radius: 999px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: filter 0.15s ease, background 0.15s ease, transform 0.1s ease;
+    }
+    .modal-buttons button:active { transform: translateY(1px); }
+    .btn-primary {
+      background: linear-gradient(160deg, #e8a0b4 0%, #c2607e 100%);
+      color: #fff;
+    }
+    .btn-primary:hover { filter: brightness(1.05); }
+    .btn-secondary {
+      background: #fde7ef;
+      color: #c2607e;
+      border: 2px solid #f8bbd0;
+    }
+    .btn-secondary:hover { background: #fcd4e0; }
+    .btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    @media (max-width: 420px) {
+      .card { padding: 1.5rem 1rem; border-radius: 1.5rem; }
+      .modal { padding: 1.2rem 1rem; }
+      .modal h2 { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎬 Filmhjulet</h1>
+    <p class="subtitle">Snurr hjulet og finn kveldens film</p>
+
+    <div id="wheel-container">
+      <div class="wheel-wrap">
+        <div class="pointer"></div>
+        <canvas class="wheel" id="wheel" width="1000" height="1000"></canvas>
+      </div>
+      <button id="spin" class="spin-btn">Spinn</button>
+      <p class="count" id="count"></p>
+    </div>
+
+    <div id="empty-state" class="empty" style="display:none;">
+      🎉 Alle filmer er sett!
+      <br>
+      <a href="#" class="reset-link" id="resetLinkEmpty">Tilbakestill listen</a>
+    </div>
+
+    <div id="error-state" class="error" style="display:none;"></div>
+
+    <div class="links">
+      <a href="index.html">← Tilbake</a>
+      <a href="#" id="resetLink">Tilbakestill listen</a>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <img class="poster" id="poster" alt="" />
+      <div class="poster-fallback" id="posterFallback" style="display:none;">🎬</div>
+      <h2 id="resultTitle"></h2>
+      <p class="year" id="resultYear"></p>
+      <div class="modal-buttons">
+        <button id="seeNow" class="btn-primary">Se nå</button>
+        <button id="spinAgain" class="btn-secondary">Spinn på nytt</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE = {
+      watched: 'filmhjulet.watched.v1',
+      added:   'filmhjulet.added.v1',
+      removed: 'filmhjulet.removed.v1'
+    };
+
+    function getJSON(key, fallback) {
+      try {
+        const v = JSON.parse(localStorage.getItem(key));
+        return Array.isArray(v) ? v : (fallback || []);
+      } catch { return fallback || []; }
+    }
+    function setJSON(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    // RFC 4180-ish CSV parser (handles quoted fields with embedded commas and escaped quotes)
+    function parseCSV(text) {
+      const rows = [];
+      let row = [], field = '', inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (inQuotes) {
+          if (c === '"') {
+            if (text[i + 1] === '"') { field += '"'; i++; }
+            else inQuotes = false;
+          } else field += c;
+        } else {
+          if (c === '"') inQuotes = true;
+          else if (c === ',') { row.push(field); field = ''; }
+          else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+          else if (c !== '\r') field += c;
+        }
+      }
+      if (field.length || row.length) { row.push(field); rows.push(row); }
+      return rows;
+    }
+
+    async function loadMaster() {
+      const res = await fetch('movies.csv', { cache: 'no-cache' });
+      if (!res.ok) throw new Error('Fant ikke movies.csv (status ' + res.status + ')');
+      const text = await res.text();
+      const rows = parseCSV(text).filter(r => r.length > 1 || (r.length === 1 && r[0].trim()));
+      if (!rows.length) return [];
+      const headers = rows[0].map(h => h.trim());
+      const iConst = headers.indexOf('Const');
+      const iTitle = headers.indexOf('Title');
+      const iYear  = headers.indexOf('Year');
+      return rows.slice(1).map(r => ({
+        id:    (iConst >= 0 ? r[iConst] : '') || '',
+        title: (iTitle >= 0 ? r[iTitle] : '') || '',
+        year:  (iYear  >= 0 ? r[iYear]  : '') || ''
+      })).filter(m => m.title);
+    }
+
+    async function getEffectiveList() {
+      const master  = await loadMaster();
+      const added   = getJSON(STORAGE.added);
+      const watched = new Set(getJSON(STORAGE.watched));
+      const removed = new Set(getJSON(STORAGE.removed));
+      return [...master, ...added].filter(m => !watched.has(m.id) && !removed.has(m.id));
+    }
+
+    function posterFor(id) {
+      if (!id || !/^tt\d+$/.test(id)) return null;
+      return 'https://images.metahub.space/poster/medium/' + id + '/img';
+    }
+
+    // --- Wheel rendering ---
+    const PALETTE = ['#ffd6e7', '#ffb3c6', '#f8bbd0', '#ffc6d5', '#f2a6bd', '#ffa8c0', '#f7c4d5', '#fbc5d8'];
+
+    const wheel = document.getElementById('wheel');
+    const ctx = wheel.getContext('2d');
+    const W = wheel.width, H = wheel.height;
+    const CX = W / 2, CY = H / 2, R = W / 2 - 8;
+
+    function drawWheel(movies) {
+      ctx.clearRect(0, 0, W, H);
+      if (!movies.length) return;
+      const slice = (Math.PI * 2) / movies.length;
+      const start = -Math.PI / 2;
+
+      movies.forEach((m, i) => {
+        const a0 = start + i * slice;
+        const a1 = a0 + slice;
+        ctx.beginPath();
+        ctx.moveTo(CX, CY);
+        ctx.arc(CX, CY, R, a0, a1);
+        ctx.closePath();
+        ctx.fillStyle = PALETTE[i % PALETTE.length];
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        if (movies.length <= 40) {
+          ctx.save();
+          ctx.translate(CX, CY);
+          ctx.rotate(a0 + slice / 2);
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#8b4a62';
+          const fs = movies.length <= 10 ? 26
+                   : movies.length <= 20 ? 19
+                   : movies.length <= 30 ? 14
+                   : 11;
+          ctx.font = '600 ' + fs + 'px Lato, sans-serif';
+          const maxLen = movies.length <= 10 ? 22
+                       : movies.length <= 20 ? 17
+                       : movies.length <= 30 ? 14
+                       : 12;
+          let t = m.title;
+          if (t.length > maxLen) t = t.slice(0, maxLen - 1) + '…';
+          ctx.fillText(t, R - 18, 0);
+          ctx.restore();
+        }
+      });
+
+      // Outer ring
+      ctx.beginPath();
+      ctx.arc(CX, CY, R, 0, Math.PI * 2);
+      ctx.strokeStyle = '#c2607e';
+      ctx.lineWidth = 5;
+      ctx.stroke();
+
+      // Center hub
+      ctx.beginPath();
+      ctx.arc(CX, CY, 56, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.strokeStyle = '#e8a0b4';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      ctx.fillStyle = '#c2607e';
+      ctx.font = 'bold 40px "Playfair Display", serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🎬', CX, CY + 2);
+    }
+
+    // --- Spin logic ---
+    let currentMovies = [];
+    let currentSelection = null;
+    let currentRotation = 0;
+    let spinning = false;
+
+    function resetRotation() {
+      wheel.style.transition = 'none';
+      wheel.style.transform = 'rotate(0deg)';
+      currentRotation = 0;
+      // force reflow so the next transition re-applies
+      void wheel.offsetHeight;
+    }
+
+    function spinTo(index, total) {
+      return new Promise(resolve => {
+        const sliceDeg = 360 / total;
+        const targetCenterCW = (index + 0.5) * sliceDeg;
+        const baseTarget = -targetCenterCW;
+
+        const currentMod = ((currentRotation % 360) + 360) % 360;
+        const targetMod  = ((baseTarget      % 360) + 360) % 360;
+        let delta = targetMod - currentMod;
+        if (delta <= 0) delta += 360;
+        const fullTurns = 5 + Math.floor(Math.random() * 3);
+        delta += 360 * fullTurns;
+        // small jitter so the pointer doesn't always land dead-center (kept well inside the sector)
+        delta += (Math.random() - 0.5) * sliceDeg * 0.55;
+
+        const final = currentRotation + delta;
+        wheel.style.transition = 'transform 4.6s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+        wheel.style.transform = 'rotate(' + final + 'deg)';
+        currentRotation = final;
+
+        let done = false;
+        const onEnd = () => {
+          if (done) return;
+          done = true;
+          wheel.removeEventListener('transitionend', onEnd);
+          resolve();
+        };
+        wheel.addEventListener('transitionend', onEnd);
+        // Safety fallback in case transitionend is missed
+        setTimeout(onEnd, 5200);
+      });
+    }
+
+    async function performSpin(excludeIds) {
+      if (spinning || !currentMovies.length) return;
+      const ex = excludeIds || new Set();
+      let candidates = currentMovies
+        .map((m, i) => ({ m, i }))
+        .filter(({ m }) => !ex.has(m.id));
+      // If everyone is excluded (edge case: 1 movie left + re-spin), fall back to all
+      if (!candidates.length) candidates = currentMovies.map((m, i) => ({ m, i }));
+
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      currentSelection = pick.m;
+      spinning = true;
+      document.getElementById('spin').disabled = true;
+      await spinTo(pick.i, currentMovies.length);
+      spinning = false;
+      document.getElementById('spin').disabled = false;
+      showModal(pick.m);
+    }
+
+    function showModal(m) {
+      const modal = document.getElementById('modal');
+      document.getElementById('resultTitle').textContent = m.title;
+      document.getElementById('resultYear').textContent = m.year || '';
+
+      const img = document.getElementById('poster');
+      const fb  = document.getElementById('posterFallback');
+      const url = posterFor(m.id);
+      if (url) {
+        img.style.display = '';
+        fb.style.display  = 'none';
+        img.onerror = () => { img.style.display = 'none'; fb.style.display = ''; };
+        img.src = url;
+      } else {
+        img.style.display = 'none';
+        fb.style.display  = '';
+      }
+
+      // Can only "spin again" if there's at least 2 movies on the wheel
+      document.getElementById('spinAgain').disabled = currentMovies.length <= 1;
+
+      modal.classList.add('open');
+    }
+    function hideModal() {
+      document.getElementById('modal').classList.remove('open');
+    }
+
+    function updateUI() {
+      const empty = currentMovies.length === 0;
+      document.getElementById('wheel-container').style.display = empty ? 'none' : '';
+      document.getElementById('empty-state').style.display = empty ? 'block' : 'none';
+      if (!empty) {
+        drawWheel(currentMovies);
+        const n = currentMovies.length;
+        document.getElementById('count').textContent = n + ' film' + (n === 1 ? '' : 'er') + ' igjen';
+        document.getElementById('spin').disabled = n < 1;
+      }
+    }
+
+    async function reloadFromStorage() {
+      currentMovies = await getEffectiveList();
+      updateUI();
+    }
+
+    // --- Events ---
+    document.getElementById('spin').addEventListener('click', () => performSpin());
+
+    document.getElementById('seeNow').addEventListener('click', async () => {
+      if (!currentSelection) return;
+      const w = getJSON(STORAGE.watched);
+      if (!w.includes(currentSelection.id)) {
+        w.push(currentSelection.id);
+        setJSON(STORAGE.watched, w);
+      }
+      currentSelection = null;
+      hideModal();
+      resetRotation();
+      await reloadFromStorage();
+    });
+
+    document.getElementById('spinAgain').addEventListener('click', () => {
+      const exId = currentSelection ? currentSelection.id : null;
+      hideModal();
+      performSpin(exId ? new Set([exId]) : new Set());
+    });
+
+    function doReset(e) {
+      if (e) e.preventDefault();
+      if (!confirm('Tilbakestill listen? Alle "sett"-markeringer fjernes.')) return;
+      setJSON(STORAGE.watched, []);
+      resetRotation();
+      reloadFromStorage();
+    }
+    document.getElementById('resetLink').addEventListener('click', doReset);
+    document.getElementById('resetLinkEmpty').addEventListener('click', doReset);
+
+    // Click on modal backdrop dismisses (but we keep the movie selected-pool unchanged,
+    // treated like "spinn på nytt" intent would be ambiguous, so we just close the modal)
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') hideModal();
+    });
+
+    // --- Init ---
+    (async () => {
+      try {
+        await reloadFromStorage();
+      } catch (err) {
+        document.getElementById('wheel-container').style.display = 'none';
+        const el = document.getElementById('error-state');
+        el.style.display = 'block';
+        el.textContent = 'Kunne ikke laste filmlisten: ' + err.message;
+      }
+    })();
+  </script>
+</body>
+</html>

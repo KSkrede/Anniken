@@ -116,6 +116,25 @@
       color: #c2607e;
       display: none;
     }
+
+    .side-link {
+      display: inline-block;
+      margin-top: 1.6rem;
+      padding: 0.7rem 1.6rem;
+      background: linear-gradient(160deg, #e8a0b4 0%, #c2607e 100%);
+      color: #fff;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      box-shadow: 0 4px 14px rgba(199, 100, 140, 0.28);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .side-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(199, 100, 140, 0.38);
+    }
   </style>
 </head>
 <body>
@@ -148,6 +167,8 @@
 
     <p class="finished-message" id="finished">🎉 Kristian er her! 🎉</p>
     <p class="target-date">15. mai 2026 kl. 23:00</p>
+
+    <a class="side-link" href="filmhjulet.html">🎬 Åpne Filmhjulet</a>
   </div>
 
   <script>
