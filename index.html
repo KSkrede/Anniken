@@ -2,181 +2,239 @@
 <html lang="no">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Kristian kommer til Zadar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --bg-color: #ffdce8;
+      --text-main: #6b2640;
+      --text-sub: #b05c7b;
+      --accent: #d96c8e;
+      --glass-bg: rgba(255, 255, 255, 0.4);
+      --glass-border: rgba(255, 255, 255, 0.7);
+      --shadow-sm: 0 8px 32px rgba(217, 108, 142, 0.15);
+      --shadow-lg: 0 24px 64px rgba(217, 108, 142, 0.25);
     }
 
     body {
-      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: var(--bg-color);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+      position: relative;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 40%, #ffd1dc 70%, #fce4ec 100%);
-      font-family: 'Lato', sans-serif;
-      color: #8b4a62;
-      text-align: center;
-      padding: 2rem;
     }
 
-    .card {
-      background: rgba(255, 255, 255, 0.55);
-      backdrop-filter: blur(10px);
-      border-radius: 2rem;
-      padding: 3rem 4rem;
-      box-shadow: 0 8px 40px rgba(199, 100, 140, 0.18);
-      max-width: 700px;
+    /* Noise & Mesh Background */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image: 
+        radial-gradient(circle at 10% 20%, #ffc4db 0%, transparent 60%),
+        radial-gradient(circle at 90% 80%, #ffd1e1 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, #fff0f5 0%, transparent 60%);
+      filter: blur(40px);
+    }
+    .bg-noise {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+      opacity: 0.2;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    .app-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(2rem, 5vh, 4rem) 1.5rem;
+      justify-content: space-between;
+      max-width: 600px;
+      margin: 0 auto;
       width: 100%;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: fadeDown 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     .hearts {
       font-size: 2rem;
-      letter-spacing: 0.3rem;
-      margin-bottom: 1.2rem;
-      color: #e8a0b4;
+      letter-spacing: 0.3em;
+      margin-bottom: 1rem;
+      opacity: 0.8;
     }
 
     h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 6vw, 3.2rem);
-      font-weight: 700;
-      color: #c2607e;
-      line-height: 1.25;
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(3.5rem, 12vw, 5rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1;
+      letter-spacing: -0.02em;
       margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--text-main), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .subtitle {
-      font-size: 1.05rem;
+    .target-date {
+      font-size: 1rem;
       font-weight: 300;
-      color: #b07090;
-      margin-bottom: 2.5rem;
-      letter-spacing: 0.08em;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
     .countdown {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      animation: scaleUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+      opacity: 0;
     }
 
     .time-block {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1.5rem;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      background: linear-gradient(160deg, #ffd6e7 0%, #ffb3c6 100%);
-      border-radius: 1.2rem;
-      padding: 1.2rem 1.5rem;
-      min-width: 90px;
-      box-shadow: 0 4px 16px rgba(199, 100, 140, 0.15);
+      justify-content: center;
     }
 
     .time-value {
-      font-family: 'Playfair Display', serif;
-      font-size: 3rem;
-      font-weight: 700;
-      color: #c2607e;
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(3.5rem, 10vw, 4.5rem);
+      color: var(--accent);
       line-height: 1;
     }
 
     .time-label {
       font-size: 0.75rem;
-      font-weight: 400;
-      color: #b07090;
-      letter-spacing: 0.12em;
+      font-weight: 600;
+      color: var(--text-sub);
       text-transform: uppercase;
-      margin-top: 0.4rem;
-    }
-
-    .separator {
-      display: flex;
-      align-items: center;
-      font-size: 2rem;
-      color: #e8a0b4;
-      padding-top: 0.2rem;
-    }
-
-    .target-date {
-      font-size: 0.9rem;
-      color: #b07090;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.15em;
+      margin-top: 0.5rem;
     }
 
     .finished-message {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
-      color: #c2607e;
+      font-family: 'Instrument Serif', serif;
+      font-size: 3rem;
+      font-style: italic;
+      color: var(--accent);
+      text-align: center;
       display: none;
+      animation: popIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .side-link {
-      display: inline-block;
-      margin-top: 1.6rem;
-      padding: 0.7rem 1.6rem;
-      background: linear-gradient(160deg, #e8a0b4 0%, #c2607e 100%);
+    .nav-footer {
+      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+      opacity: 0;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .btn-large {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 1.25rem 2rem;
+      background: linear-gradient(135deg, #f5a3b8 0%, #d96c8e 100%);
       color: #fff;
-      border-radius: 999px;
+      border-radius: 100px;
       text-decoration: none;
-      font-size: 0.95rem;
+      font-size: 1.1rem;
       font-weight: 600;
-      letter-spacing: 0.06em;
-      box-shadow: 0 4px 14px rgba(199, 100, 140, 0.28);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      letter-spacing: 0.05em;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
     }
-    .side-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(199, 100, 140, 0.38);
+
+    .btn-large:active {
+      transform: scale(0.98);
+      box-shadow: var(--shadow-sm);
     }
+
+    /* Desktop Enhancements */
+    @media (min-width: 600px) {
+      .countdown { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+      .btn-large:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(217,108,142,0.4); }
+    }
+
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="hearts">🌸 💖 🌸</div>
-    <h1>Kristian kommer til Zadar</h1>
-    <p class="subtitle">Gleder oss!</p>
+  <div class="bg-mesh"></div>
+  <div class="bg-noise"></div>
 
-    <div class="countdown" id="countdown">
-      <div class="time-block">
-        <span class="time-value" id="days">00</span>
-        <span class="time-label">Dager</span>
+  <div class="app-container">
+    <header>
+      <div class="hearts">🌸 💖 🌸</div>
+      <h1>Kristian til Zadar</h1>
+      <p class="target-date">15. Mai 2026 — 23:00</p>
+    </header>
+
+    <main>
+      <div class="countdown" id="countdown">
+        <div class="time-block">
+          <span class="time-value" id="days">00</span>
+          <span class="time-label">Dager</span>
+        </div>
+        <div class="time-block">
+          <span class="time-value" id="hours">00</span>
+          <span class="time-label">Timer</span>
+        </div>
+        <div class="time-block">
+          <span class="time-value" id="minutes">00</span>
+          <span class="time-label">Min</span>
+        </div>
+        <div class="time-block">
+          <span class="time-value" id="seconds">00</span>
+          <span class="time-label">Sek</span>
+        </div>
       </div>
-      <div class="separator">:</div>
-      <div class="time-block">
-        <span class="time-value" id="hours">00</span>
-        <span class="time-label">Timer</span>
-      </div>
-      <div class="separator">:</div>
-      <div class="time-block">
-        <span class="time-value" id="minutes">00</span>
-        <span class="time-label">Minutter</span>
-      </div>
-      <div class="separator">:</div>
-      <div class="time-block">
-        <span class="time-value" id="seconds">00</span>
-        <span class="time-label">Sekunder</span>
-      </div>
+      <p class="finished-message" id="finished">🎉 Han er her! 🎉</p>
+    </main>
+
+    <div class="nav-footer">
+      <a class="btn-large" href="filmhjulet.html">
+        <span>Gå til Filmhjulet 🎬</span>
+      </a>
     </div>
-
-    <p class="finished-message" id="finished">🎉 Kristian er her! 🎉</p>
-    <p class="target-date">15. mai 2026 kl. 23:00</p>
-
-    <a class="side-link" href="filmhjulet.html">🎬 Åpne Filmhjulet</a>
   </div>
 
   <script>
     const target = new Date('2026-05-15T23:00:00');
-
-    function pad(n) {
-      return String(n).padStart(2, '0');
-    }
+    function pad(n) { return String(n).padStart(2, '0'); }
 
     function tick() {
       const now = new Date();
