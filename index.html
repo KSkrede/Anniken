@@ -23,34 +23,13 @@
 
     body {
       min-height: 100dvh;
-      background-color: var(--bg-color);
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 40%, #ffd1dc 70%, #fce4ec 100%);
       font-family: 'Outfit', sans-serif;
       color: var(--text-main);
       overflow-x: hidden;
       position: relative;
       display: flex;
       flex-direction: column;
-    }
-
-    /* Noise & Mesh Background */
-    .bg-mesh {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      background-image: 
-        radial-gradient(circle at 10% 20%, #ffc4db 0%, transparent 60%),
-        radial-gradient(circle at 90% 80%, #ffd1e1 0%, transparent 60%),
-        radial-gradient(circle at 50% 50%, #fff0f5 0%, transparent 60%);
-      filter: blur(40px);
-    }
-    .bg-noise {
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
-      opacity: 0.2;
-      mix-blend-mode: multiply;
-      pointer-events: none;
     }
 
     .app-container {
@@ -230,9 +209,6 @@
   </style>
 </head>
 <body>
-  <div class="bg-mesh"></div>
-  <div class="bg-noise"></div>
-
   <div class="app-container">
     <header>
       <div class="hearts">🌸 💖 🌸</div>
