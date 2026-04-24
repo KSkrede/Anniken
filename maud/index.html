@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>K+A &lt;3</title>
-  <link rel="icon" type="image/png" href="assets/oss.png">
-  <link rel="apple-touch-icon" href="assets/oss.png">
+  <title>Håki+Maud ❤️</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/maud.png">
+  <link rel="apple-touch-icon" href="../assets/maud.png">
   <link
     href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;600&display=swap"
     rel="stylesheet">
@@ -141,32 +141,38 @@
       animation: popIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .nav-footer {
-      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+    .hero-image-wrapper {
+      position: relative;
+      margin: 0 auto 2.5rem;
+      width: clamp(200px, 70vw, 360px);
+      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
       opacity: 0;
-      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 1;
     }
 
-    .btn-large {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .hero-image {
       width: 100%;
-      padding: 1.25rem 2rem;
-      background: linear-gradient(135deg, #f5a3b8 0%, #d96c8e 100%);
-      color: #fff;
-      border-radius: 100px;
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      box-shadow: var(--shadow-lg);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+      height: auto;
+      border-radius: 1.5rem;
+      position: relative;
+      z-index: 2;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .btn-large:active {
-      transform: scale(0.98);
-      box-shadow: var(--shadow-sm);
+    .hero-image-wrapper:hover .hero-image {
+      transform: translateY(-8px) scale(1.03) rotate(-2deg);
+    }
+
+    .hero-image-glow {
+      position: absolute;
+      inset: -15%;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      filter: blur(20px);
+      opacity: 0.4;
+      z-index: 1;
+      border-radius: 50%;
+      animation: pulseGlow 4s ease-in-out infinite alternate;
+      pointer-events: none;
     }
 
     .heart {
@@ -190,16 +196,14 @@
       }
     }
 
-    /* Desktop Enhancements */
     @media (min-width: 600px) {
       .countdown {
         grid-template-columns: repeat(4, 1fr);
         gap: 1.5rem;
       }
 
-      .btn-large:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 40px rgba(217, 108, 142, 0.4);
+      .hero-image-wrapper:hover .hero-image {
+        transform: translateY(-8px) scale(1.03) rotate(-2deg);
       }
     }
 
@@ -262,40 +266,6 @@
         opacity: 0.4;
       }
     }
-
-    .hero-image-wrapper {
-      position: relative;
-      margin: 0 auto 2.5rem;
-      width: clamp(200px, 70vw, 360px);
-      animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
-      opacity: 0;
-      z-index: 1;
-    }
-
-    .hero-image {
-      width: 100%;
-      height: auto;
-      border-radius: 1.5rem;
-      position: relative;
-      z-index: 2;
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .hero-image-wrapper:hover .hero-image {
-      transform: translateY(-8px) scale(1.03) rotate(-2deg);
-    }
-
-    .hero-image-glow {
-      position: absolute;
-      inset: -15%;
-      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-      filter: blur(20px);
-      opacity: 0.4;
-      z-index: 1;
-      border-radius: 50%;
-      animation: pulseGlow 4s ease-in-out infinite alternate;
-      pointer-events: none;
-    }
   </style>
 </head>
 
@@ -303,8 +273,8 @@
   <div class="app-container">
     <header>
       <div class="hearts">🌸 💖 🌸</div>
-      <h1>Kristian til Zadar</h1>
-      <p class="target-date">15. Mai 2026 — 23:00</p>
+      <h1>Håki til Zadar</h1>
+      <p class="target-date">22. mai 2026 — 17:00</p>
     </header>
 
     <main>
@@ -330,22 +300,13 @@
 
       <div class="hero-image-wrapper">
         <div class="hero-image-glow"></div>
-        <img src="assets/zadar.png" alt="Zadar" class="hero-image" loading="lazy">
+        <img src="../assets/haaki.png" alt="Håki til Zadar" class="hero-image" loading="lazy">
       </div>
     </main>
-
-    <div class="nav-footer">
-      <a class="btn-large" href="filmhjulet.html">
-        <span>Gå til Filmhjulet 🎬</span>
-      </a>
-      <a class="btn-large" href="maud/" style="margin-top: 1rem;">
-        <span>Håki+Maud ❤️</span>
-      </a>
-    </div>
   </div>
 
   <script>
-    const target = new Date('2026-05-15T23:00:00');
+    const target = new Date('2026-05-22T17:00:00');
     function pad(n) { return String(n).padStart(2, '0'); }
 
     function tick() {
@@ -373,7 +334,6 @@
     setInterval(tick, 1000);
 
     const hero = document.querySelector('.hero-image-wrapper');
-
     const emojis = ['💖', '💕', '💗', '💘'];
 
     let isTouching = false;
@@ -385,7 +345,6 @@
       heart.className = 'heart';
       heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
 
-      // Position relative to wrapper
       heart.style.left = `${x - rect.left}px`;
       heart.style.top = `${y - rect.top}px`;
 
@@ -394,7 +353,6 @@
       setTimeout(() => heart.remove(), 1200);
     }
 
-    // 🔹 Mouse (desktop)
     hero.addEventListener('mousedown', () => isTouching = true);
     hero.addEventListener('mouseup', () => isTouching = false);
     hero.addEventListener('mouseleave', () => isTouching = false);
@@ -404,9 +362,7 @@
       spawnHeart(e.clientX, e.clientY);
     });
 
-    // 🔹 Touch (mobile)
     hero.addEventListener('touchstart', () => isTouching = true);
-
     hero.addEventListener('touchend', () => isTouching = false);
 
     hero.addEventListener('touchmove', (e) => {
