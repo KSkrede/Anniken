@@ -147,6 +147,15 @@
       padding-bottom: env(safe-area-inset-bottom);
     }
 
+    .footer-clock {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-sub);
+      text-align: center;
+      letter-spacing: 0.03em;
+    }
+
     .btn-large {
       display: flex;
       align-items: center;
@@ -272,6 +281,11 @@
       z-index: 1;
     }
 
+    .spotify-embed-wrapper {
+      margin: 0 auto 1.75rem;
+      width: 100%;
+    }
+
     .hero-image {
       width: 100%;
       height: auto;
@@ -332,6 +346,9 @@
         <div class="hero-image-glow"></div>
         <img src="assets/zadar.png" alt="Zadar" class="hero-image" loading="lazy">
       </div>
+      <div class="spotify-embed-wrapper">
+        <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0hlItFYTYvMwhUNbtxNQyW?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      </div>
     </main>
 
     <div class="nav-footer">
@@ -341,6 +358,7 @@
       <a class="btn-large" href="maud/" style="margin-top: 1rem;">
         <span>Håki+Maud ❤️</span>
       </a>
+      <p class="footer-clock"><span id="met-days">0</span> Dager siden vi møttes på Kanelsnurren Skøyen</p>
     </div>
   </div>
 
@@ -372,9 +390,21 @@
     tick();
     setInterval(tick, 1000);
 
+    function updateMetDays() {
+      const metDate = new Date('2024-07-28T11:30:00');
+      const now = new Date();
+      const diffMs = now - metDate;
+      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      document.getElementById('met-days').textContent = String(days);
+    }
+
+    updateMetDays();
+    setInterval(updateMetDays, 1000 * 60 * 60);
+
     const hero = document.querySelector('.hero-image-wrapper');
 
     const emojis = ['💖', '💕', '💗', '💘'];
+    const randomEmoji = () => emojis[Math.floor(Math.random() * emojis.length)] || emojis[0];
 
     let isTouching = false;
 
@@ -383,7 +413,7 @@
 
       const heart = document.createElement('div');
       heart.className = 'heart';
-      heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      heart.textContent = randomEmoji();
 
       // Position relative to wrapper
       heart.style.left = `${x - rect.left}px`;
