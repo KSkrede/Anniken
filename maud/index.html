@@ -266,6 +266,68 @@
         opacity: 0.4;
       }
     }
+
+    .birthday-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .birthday-modal.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-content {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      max-width: 90%;
+      width: 400px;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    .birthday-modal.show .modal-content {
+      transform: translateY(0);
+    }
+    .modal-content h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 2.5rem;
+      font-style: italic;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      line-height: 1.1;
+    }
+    .modal-content p {
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+    .modal-content button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+      font-family: 'Outfit', sans-serif;
+    }
+    .modal-content button:hover {
+      transform: scale(1.05);
+      background: var(--text-sub);
+    }
   </style>
 </head>
 
@@ -305,6 +367,17 @@
     </main>
   </div>
 
+  <div id="birthdayModal" class="birthday-modal" style="display: none;">
+    <div class="modal-content">
+      <h2>Gratulerer med dagen, Maud! 🥳</h2>
+      <p>Håper du får en fantastisk dag i "Zagreb"! Klem fra alle tanter og onkler❤️</p>
+      <button id="closeModal">Takk!</button>
+    </div>
+  </div>
+
+  <audio id="bdayAudio" src="../assets/Gratulere.mp3" preload="auto"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script>
     const target = new Date('2026-05-22T17:00:00');
     function pad(n) { return String(n).padStart(2, '0'); }
@@ -334,7 +407,60 @@
     setInterval(tick, 1000);
 
     const hero = document.querySelector('.hero-image-wrapper');
-    const emojis = ['💖', '💕', '💗', '💘'];
+    let emojis = ['💖', '💕', '💗', '💘'];
+
+    const todayDate = new Date();
+    // Month is 0-indexed in JS (3 = April)
+    const isMaudsBirthday = todayDate.getMonth() === 3 && todayDate.getDate() === 30;
+
+    if (isMaudsBirthday) {
+      emojis = ['🎂', '🎉', '🎁', '🥳'];
+      
+      const modal = document.getElementById('birthdayModal');
+      if (modal) {
+        const closeBtn = document.getElementById('closeModal');
+        
+        modal.style.display = 'flex';
+        setTimeout(() => {
+          modal.classList.add('show');
+          if (typeof confetti === 'function') {
+            const duration = 15 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+              const timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval);
+              }
+
+              const particleCount = 50 * (timeLeft / duration);
+              
+              // since particles fall down, start a bit higher than random
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }, colors: ['#d96c8e', '#b05c7b', '#fce4ec', '#ffdce8', '#6b2640'] }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }, colors: ['#d96c8e', '#b05c7b', '#fce4ec', '#ffdce8', '#6b2640'] }));
+            }, 250);
+          }
+        }, 100);
+
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+            
+            const audio = document.getElementById('bdayAudio');
+            if (audio) {
+              audio.play().catch(e => console.error("Audio playback failed:", e));
+            }
+          });
+        }
+      }
+    }
 
     let isTouching = false;
 
